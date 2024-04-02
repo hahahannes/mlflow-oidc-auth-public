@@ -170,3 +170,7 @@ cython_debug/
 .DS_Store
 
 flask_session/
+*.db
+*.sqlite3
+*.sqlite
+
