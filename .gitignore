@@ -173,6 +173,9 @@ flask_session/
 *.db
 *.sqlite3
 *.sqlite
+*.db-*
+*.sqlite3-*
+*.sqlite-*
 
 node_modules/
 .angular/
