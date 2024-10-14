@@ -96,6 +96,8 @@ from mlflow_oidc_auth.sqlalchemy_store import SqlAlchemyStore
 
 from mlflow.server import app
 
+import jwt 
+
 # Create the OAuth2 client
 auth_client = WebApplicationClient(AppConfig.get_property("OIDC_CLIENT_ID"))
 store = SqlAlchemyStore()
@@ -724,6 +726,10 @@ def callback():
     is_admin = False
     user_groups = []
 
+    decoded_access_token = jwt.decode(access_token, options={"verify_signature": False})
+    app.logger.debug(f"{decoded_access_token}")
+    app.logger.debug(f"{user_data}")
+
     if AppConfig.get_property("OIDC_GROUP_DETECTION_PLUGIN"):
         import importlib
 
@@ -731,7 +737,12 @@ def callback():
             access_token
         )
     else:
-        user_groups = user_data.get(AppConfig.get_property("OIDC_GROUPS_ATTRIBUTE"), [])
+        attr = AppConfig.get_property("OIDC_GROUPS_ATTRIBUTE")
+        if attr in decoded_access_token:
+            user_groups = decoded_access_token[attr]
+        if attr in user_data:
+            user_groups = user_data[attr]
+        
 
     app.logger.debug(f"User groups: {user_groups}")
 
