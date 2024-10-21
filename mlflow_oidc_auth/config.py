@@ -21,6 +21,8 @@ class AppConfig:
     OIDC_DISCOVERY_URL = os.environ.get("OIDC_DISCOVERY_URL", None)
     OIDC_GROUPS_ATTRIBUTE = os.environ.get("OIDC_GROUPS_ATTRIBUTE", "groups")
     OIDC_SCOPE = os.environ.get("OIDC_SCOPE", "openid,email,profile")
+    OIDC_AUDIENCE = os.environ.get("OIDC_AUDIENCE", None)
+    OIDC_PUBLIC_KEYS = os.environ.get("OIDC_PUBLIC_KEYS", None)
     OIDC_GROUP_DETECTION_PLUGIN = os.environ.get("OIDC_GROUP_DETECTION_PLUGIN", None)
     if OIDC_DISCOVERY_URL:
         response = requests.get(OIDC_DISCOVERY_URL)

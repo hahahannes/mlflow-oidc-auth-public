@@ -1,5 +1,6 @@
 import os
 import re
+import jwt.algorithms
 import requests
 import secrets
 import string
@@ -97,6 +98,7 @@ from mlflow_oidc_auth.sqlalchemy_store import SqlAlchemyStore
 from mlflow.server import app
 
 import jwt 
+import json
 
 # Create the OAuth2 client
 auth_client = WebApplicationClient(AppConfig.get_property("OIDC_CLIENT_ID"))
@@ -613,22 +615,61 @@ def _get_proxy_artifact_validator(method: str, view_args: Optional[Dict[str, Any
     }.get(method)
 
 
+def _get_public_keys():
+    """
+    Returns:
+        List of RSA public keys usable by PyJWT.
+    """
+    r = requests.get(AppConfig.get_property("OIDC_PUBLIC_KEYS"))
+    public_keys = []
+    jwk_set = r.json()
+    for key_dict in jwk_set["keys"]:
+        public_key = jwt.algorithms.RSAAlgorithm.from_jwk(json.dumps(key_dict))
+        public_keys.append(public_key)
+    return public_keys
+
+
+def authenticate_token():
+    """
+    Verify the token in the request.
+    """
+    token = request.authorization.token
+    keys = _get_public_keys()
+
+    # Loop through the keys since we can't pass the key set to the decoder
+    valid_token = True
+    for key in keys:
+        try:
+            # decode returns the claims that has the email when needed
+            token = jwt.decode(token, key=key, audience=AppConfig.get_property("OIDC_AUDIENCE"), algorithms=["RS256"])
+            _set_username(token["email"])
+            break
+        except Exception as e:
+            print(token)
+            print(e)
+    
+    return valid_token
+
+
 def before_request_hook():
     """Called before each request. If it did not return a response,
     the view function for the matched route is called and returns a response"""
     if _is_unprotected_route(request.path):
         return
+    
     if request.authorization is not None:
-        if not authenticate_request_basic_auth():
-            return make_basic_auth_response()
-    else:
-        # authentication
-        if not _get_username():
-            return render_template(
-                "auth.html",
-                username=None,
-                provide_display_name=AppConfig.get_property("OIDC_PROVIDER_DISPLAY_NAME"),
-            )
+        if not authenticate_token():        
+            if not authenticate_request_basic_auth():
+                return make_basic_auth_response()
+        
+    # authentication
+    if not _get_username():
+        return redirect("/login")
+        return render_template(
+            "auth.html",
+            username=None,
+            provide_display_name=AppConfig.get_property("OIDC_PROVIDER_DISPLAY_NAME"),
+        )
     # admins don't need to be authorized
     if _get_is_admin():
         return
@@ -691,6 +732,11 @@ def login():
 
 def logout():
     session.clear()
+    return render_template(
+                "auth.html",
+                username=None,
+                provide_display_name=AppConfig.get_property("OIDC_PROVIDER_DISPLAY_NAME"),
+    )
     return redirect("/")
 
 
@@ -726,7 +772,7 @@ def callback():
     is_admin = False
     user_groups = []
 
-    decoded_access_token = jwt.decode(access_token, options={"verify_signature": False})
+    decoded_access_token = jwt.decode(access_token, audience=AppConfig.get_property("OIDC_AUDIENCE"), options={"verify_signature": False})
     app.logger.debug(f"{decoded_access_token}")
     app.logger.debug(f"{user_data}")
 
@@ -757,6 +803,7 @@ def callback():
     # set user groups
     store.set_user_groups(email.lower(), user_groups)
     _set_username(email.lower())
+    return redirect("/")
     return redirect(url_for("oidc_ui"))
 
 

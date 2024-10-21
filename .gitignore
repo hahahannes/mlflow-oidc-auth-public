@@ -1,12 +1,14 @@
 web-ui/.angular/
 web-ui/node_modules/
-mlflow-oidc-auth/ui
+mlflow_oidc_auth/ui
 node_modules/
 /venv/
 /instance/
 mlruns/
 basic_auth.db
 basic_auth
+.env
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
