@@ -818,7 +818,7 @@ def callback():
     # set user groups
     store.set_user_groups(email.lower(), user_groups)
     _set_username(email.lower())
-    return redirect(url_for("", _external=True))
+    return redirect("/")
     return redirect(url_for("oidc_ui"))
 
 
@@ -1154,7 +1154,7 @@ def update_group_model_permission(group_name):
 
 def index():
     from mlflow_oidc_auth.app import static_folder
-    app.logger.debug(os.path.join(static_folder, "index.html"))
+    app.logger.debug(f"INDEX: {os.path.join(static_folder, 'index.html')}")
     if os.path.exists(os.path.join(static_folder, "index.html")):
         with open(os.path.join(static_folder, "index.html"), "r") as f:
             html_content = f.read()
