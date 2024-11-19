@@ -633,7 +633,6 @@ def authenticate_token():
     """
     Verify the token in the request.
     """
-    print(request.headers)
     token = request.authorization.token
     keys = _get_public_keys()
 
@@ -657,7 +656,7 @@ def before_request_hook():
     the view function for the matched route is called and returns a response"""
     if _is_unprotected_route(request.path):
         return
-    
+    print(request.headers)
     if request.authorization is not None:
         if not authenticate_token():        
             if not authenticate_request_basic_auth():
