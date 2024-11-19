@@ -679,7 +679,7 @@ def before_request_hook():
         
     # authentication
     if not _get_username():
-        return redirect("/login")
+        return redirect(url_for("/login"))
         return render_template(
             "auth.html",
             username=None,
@@ -818,7 +818,7 @@ def callback():
     # set user groups
     store.set_user_groups(email.lower(), user_groups)
     _set_username(email.lower())
-    return redirect("/")
+    return redirect(url_for("/"))
     return redirect(url_for("oidc_ui"))
 
 
