@@ -37,7 +37,6 @@ class AppConfig:
     OIDC_REDIRECT_URI = os.environ.get("OIDC_REDIRECT_URI", None)
     OIDC_CLIENT_ID = os.environ.get("OIDC_CLIENT_ID", None)
     OIDC_CLIENT_SECRET = os.environ.get("OIDC_CLIENT_SECRET", None)
-    SERVER_NAME = os.environ["SERVER_NAME"]
     
     @staticmethod
     def get_property(property_name):
