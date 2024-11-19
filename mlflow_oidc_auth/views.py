@@ -655,6 +655,7 @@ def before_request_hook():
     """Called before each request. If it did not return a response,
     the view function for the matched route is called and returns a response"""
     app.logger.debug(request.headers)
+    app.logger.debug(request.environ)
     if _is_unprotected_route(request.path):
         return
     if request.authorization is not None:
