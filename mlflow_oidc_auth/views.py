@@ -638,6 +638,7 @@ def authenticate_header():
         create_user(username=userid, display_name=userid, is_admin=False)
     except Exception as e:
         app.logger.debug(e)
+    return True
 
 def authenticate_token():
     """
@@ -669,7 +670,7 @@ def before_request_hook():
     if _is_unprotected_route(request.path):
         return
     if authenticate_header():
-        return 
+        pass 
     
     if request.authorization is not None:
         if not authenticate_token():        
