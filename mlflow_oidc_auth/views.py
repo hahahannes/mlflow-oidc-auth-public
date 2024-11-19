@@ -633,6 +633,7 @@ def authenticate_token():
     """
     Verify the token in the request.
     """
+    print(request.headers)
     token = request.authorization.token
     keys = _get_public_keys()
 
