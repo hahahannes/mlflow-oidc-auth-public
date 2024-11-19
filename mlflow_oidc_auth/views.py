@@ -629,6 +629,14 @@ def _get_public_keys():
     return public_keys
 
 
+def authenticate_header():
+    userid = request.headers['Kubeflow-Userid']
+    _set_username(userid)
+    try:
+        create_user(username=userid, display_name=userid, is_admin=False)
+    except Exception as e:
+        app.logger.debug(e)
+
 def authenticate_token():
     """
     Verify the token in the request.
@@ -658,6 +666,9 @@ def before_request_hook():
     app.logger.debug(request.environ)
     if _is_unprotected_route(request.path):
         return
+    if authenticate_header():
+        return 
+    
     if request.authorization is not None:
         if not authenticate_token():        
             if not authenticate_request_basic_auth():
