@@ -645,8 +645,8 @@ def authenticate_token():
             _set_username(token["email"])
             break
         except Exception as e:
-            print(token)
-            print(e)
+            app.logger.debug(token)
+            app.logger.debug(e)
     
     return valid_token
 
@@ -654,9 +654,9 @@ def authenticate_token():
 def before_request_hook():
     """Called before each request. If it did not return a response,
     the view function for the matched route is called and returns a response"""
+    app.logger.debug(request.headers)
     if _is_unprotected_route(request.path):
         return
-    print(request.headers)
     if request.authorization is not None:
         if not authenticate_token():        
             if not authenticate_request_basic_auth():
