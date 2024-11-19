@@ -630,7 +630,9 @@ def _get_public_keys():
 
 
 def authenticate_header():
-    userid = request.headers['Kubeflow-Userid']
+    userid = request.headers.get('Kubeflow-Userid')
+    if not userid:
+        return False
     _set_username(userid)
     try:
         create_user(username=userid, display_name=userid, is_admin=False)
