@@ -178,7 +178,7 @@ class SqlAlchemyStore:
     def get_user_groups_experiment_permission(self, experiment_id: str, username: str) -> ExperimentPermission:
         with self.ManagedSessionMaker() as session:
             user_groups = self.get_groups_for_user(username)
-            user_perms: ExperimentPermission
+            user_perms: ExperimentPermission = None
             for ug in user_groups:
                 perms = self._get_experiment_group_permission(session, experiment_id, ug)
                 if user_perms is None or perms.permission.priority > user_perms.permission.priority:
