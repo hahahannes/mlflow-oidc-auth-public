@@ -181,18 +181,15 @@ class SqlAlchemyStore:
             user_perms: ExperimentPermission
             for ug in user_groups:
                 perms = self._get_experiment_group_permission(session, experiment_id, ug)
-                try:
-                    if perms.permission.priority > user_perms.permission.priority:
-                        user_perms = perms
-                except AttributeError:
+                if user_perms is None or perms.permission.priority > user_perms.permission.priority:
                     user_perms = perms
-            try:
-                return user_perms.to_mlflow_entity()
-            except AttributeError:
+            
+            if user_perms is None:
                 raise MlflowException(
                     f"Experiment permission with experiment_id={experiment_id} and username={username} not found",
                     RESOURCE_DOES_NOT_EXIST,
                 )
+            return user_perms.to_mlflow_entity() 
 
     def list_experiment_permissions(self, username: str) -> List[ExperimentPermission]:
         with self.ManagedSessionMaker() as session:
