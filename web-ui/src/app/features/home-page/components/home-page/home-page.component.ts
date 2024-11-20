@@ -50,6 +50,7 @@ export class HomePageComponent implements OnInit {
   }
 
   redirectToMLFlow() {
-    window.location.href = '/';
+    window.location.href = '../..';
+    // redirect to ../.. as base href is . which is /models/oidc/ui and I want to to /models
   }
 }
