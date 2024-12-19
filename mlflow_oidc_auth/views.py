@@ -818,7 +818,7 @@ def callback():
     # set user groups
     store.set_user_groups(email.lower(), user_groups)
     _set_username(email.lower())
-    return redirect("/")
+    return redirect("/models")
     return redirect(url_for("oidc_ui"))
 
 
