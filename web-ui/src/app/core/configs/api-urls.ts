@@ -1,4 +1,4 @@
-export const api_URL = {
+export const API_URL = {
   ALL_EXPERIMENTS: '/api/2.0/mlflow/experiments',
   EXPERIMENTS_FOR_USER: '/api/2.0/mlflow/users/${userName}/experiments',
   USERS_FOR_EXPERIMENT: '/api/2.0/mlflow/experiments/${experimentName}/users',
